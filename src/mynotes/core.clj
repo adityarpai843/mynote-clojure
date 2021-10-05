@@ -9,34 +9,34 @@
 (defn addNotes []
 ;Add notes
   (println "Enter the note")
-  (def mynote (read-line))
-  (sql/insert! mysql-db
-    :note {:text mynote})  
+  (let [mynote (read-line)]
+    (sql/insert! mysql-db
+      :note {:text mynote})   
+  ) 
 )
+
 (defn viewNotes []
 (println "Notes")
 (println "------")
-(def noteArray (sql/query mysql-db ["SELECT * FROM note"]))
-(doseq [n noteArray]
-(println (get n :text))  
-)
+(let [noteArray  (sql/query mysql-db ["SELECT * FROM note"])]
+(doseq [n noteArray] (println (get n :text))))
 )
 
 (defn deleteNotes []
 (println "Notes")
 (println "------")
-(def noteArray (sql/query mysql-db ["SELECT * FROM note"]))
-(println noteArray)
+(let [noteArray (sql/query mysql-db ["SELECT * FROM note"])] 
+(doseq [n noteArray](println (format "%d. %s" (get n :id) (get n :text)))))
 (println "Select an Option")
 (println "----------------")
 (println "d1.Delete Single Note")
 (println "d2.Delete Whole Notes")
-(def dopt (read-line))
-(cond
-  (= dopt "d1")((fn [](println "Enter the ID")(def iden (read-line))(sql/delete! mysql-db :note ["id = ?" iden]))) 
-  (= dopt "d2")((fn [](sql/execute! mysql-db ["DELETE FROM note"]))) 
-  :else (println "Enter a valid option"))
-)
+(let [dopt (read-line)]
+  (cond
+    (= dopt "d1")((fn [](println "Enter the ID")(let [iden (read-line)](sql/delete! mysql-db :note ["id = ?" iden])))) 
+    (= dopt "d2")((fn [](sql/execute! mysql-db ["DELETE FROM note"]))) 
+    :else (println "Enter a valid option"))  
+))
 (defn -main
   [& args]
   (println "Note Maker")
@@ -44,10 +44,10 @@
   (println "a:Addnotes")
   (println "b:Viewnotes")
   (println "c:Delete Note/Notes")
-  (def opt (read-line))
-  (cond
-    (= opt "a")(addNotes)
-    (= opt "b")(viewNotes)
-    (= opt "c")(deleteNotes)
-    :else (println "Enter a valid option"))
+  (let [opt (read-line)] 
+    (cond
+      (= opt "a")(addNotes)
+      (= opt "b")(viewNotes)
+      (= opt "c")(deleteNotes)
+      :else (println "Enter a valid option")))
   )
